@@ -33,16 +33,15 @@ jobs:
           ssh-keygen -y -f ~/.ssh/github_actions_key > /tmp/github_actions_key.pub
           ssh-keygen -l -f /tmp/github_actions_key.pub || true
 
-        # Debug dei secrets SSH
-      - name: Debug SSH variables
-        run: |
-          echo "USER='${{ secrets.SSH_USER }}'"
-          echo "HOST='${{ secrets.SSH_HOST }}'"
-          echo "PORT='${{ secrets.SSH_PORT }}'"
 
       # Copy build to remote host using the key
       - name: Copy build to remote host
         run: |
+          echo "=== DEBUG SSH VARS (in Copy build) ==="
+          echo "USER='${{ secrets.SSH_USER }}'"
+          echo "HOST='${{ secrets.SSH_HOST }}'"
+          echo "PORT='${{ secrets.SSH_PORT }}'"
+          echo "====================================="
           # scp uses -P (capital P) to specify non-default port
           scp -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -P "${{ secrets.SSH_PORT }}" -r ./publish/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol/"
 
