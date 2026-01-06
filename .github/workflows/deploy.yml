@@ -31,6 +31,10 @@ jobs:
           echo "${{ secrets.SSH_KEY_B64 }}" | base64 --decode > ~/.ssh/github_actions_key
           chmod 600 ~/.ssh/github_actions_key
 
+      - name: Check key validity
+        run: |
+          ssh-keygen -l -f ~/.ssh/github_actions_key
+
       # Connessione SSH alla macchina locale per fare il deploy
       - name: Deploy to local machine via SSH
         run: |
