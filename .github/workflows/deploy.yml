@@ -19,6 +19,10 @@ jobs:
       # Compila l'app .NET e genera la cartella publish
       - name: Build .NET app
         run: dotnet publish ./app -c Release -o publish
+    # 🔥 Disabilita l’SSH agent che causa i tentativi multipli
+      - name: Disable SSH agent
+        run: |
+         eval "$(ssh-agent -k)" || true
 
      # Crea il file della chiave privata RSA per SSH
       - name: Create SSH key file
