@@ -41,6 +41,6 @@ jobs:
             -i ~/.ssh/github_actions_key \
             -p "${{ secrets.SSH_PORT }}" \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
-docker cp publish/. mydevops_container:/app
-docker exec mydevops_container pkill dotnet || true
-EOF
+            docker cp publish/. mydevops_container:/app
+            docker exec mydevops_container pkill dotnet || true
+          EOF
