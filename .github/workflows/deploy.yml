@@ -34,16 +34,13 @@ jobs:
       # Connessione SSH alla macchina locale per fare il deploy
       - name: Deploy to local machine via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no \
-              -o IdentitiesOnly=yes \
-              -o PreferredAuthentications=publickey \
-              -i ~/.ssh/github_actions_key
-              -p "${{ secrets.SSH_PORT }}" \
-              "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-              '
-              # Copia i file compilati dentro il container esistente
-              docker cp publish/. mydevops_container:/app
-
-              # Riavvia il processo dotnet dentro il container (senza ricrearlo)
-              docker exec mydevops_container pkill dotnet || true
-              '
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -i ~/.ssh/github_actions_key \
+            -p "${{ secrets.SSH_PORT }}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
+                docker cp publish/. mydevops_container:/app
+                docker exec mydevops_container pkill dotnet || true
+          EOF
