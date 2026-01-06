@@ -16,14 +16,14 @@ jobs:
         run: dotnet publish ./app -c Release -o publish
 
       - name: Debug SSH variables
+        if: ${{ always() }}
         run: |
           echo "USER='${{ secrets.SSH_USER }}'"
           echo "HOST='${{ secrets.SSH_HOST }}'"
           echo "PORT='${{ secrets.SSH_PORT }}'"
 
       # Create SSH key file BEFORE any scp/ssh steps
-      - name: Decode SSH key from Base64
-        if: ${{ always() }}
+      - name: Decode SSH key from Base64        
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" | base64 --decode > ~/.ssh/github_actions_key
