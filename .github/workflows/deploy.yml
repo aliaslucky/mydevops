@@ -28,8 +28,8 @@ jobs:
       - name: Create SSH key file
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github_actions_key
+          chmod 600 ~/.ssh/github_actions_key
 
       # Connessione SSH alla macchina locale per fare il deploy
       - name: Deploy to local machine via SSH
@@ -37,7 +37,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no \
               -o IdentitiesOnly=yes \
               -o PreferredAuthentications=publickey \
-              -i ~/.ssh/id_rsa \
+              -i ~/.ssh/github_actions_key
               -p "${{ secrets.SSH_PORT }}" \
               "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
               '
