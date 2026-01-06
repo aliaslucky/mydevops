@@ -36,6 +36,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
               -o IdentitiesOnly=yes \
+              -o PreferredAuthentications=publickey \
               -i ~/.ssh/id_rsa \
               -p "${{ secrets.SSH_PORT }}" \
               "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
