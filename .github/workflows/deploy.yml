@@ -15,6 +15,12 @@ jobs:
       - name: Build .NET app
         run: dotnet publish ./app -c Release -o publish
 
+      - name: Debug SSH variables
+        run: |
+          echo "USER='${{ secrets.SSH_USER }}'"
+          echo "HOST='${{ secrets.SSH_HOST }}'"
+          echo "PORT='${{ secrets.SSH_PORT }}'"
+
       # Create SSH key file BEFORE any scp/ssh steps
       - name: Decode SSH key from Base64
         run: |
@@ -36,12 +42,7 @@ jobs:
 
       # Copy build to remote host using the key
       - name: Copy build to remote host
-        run: |
-          echo "=== DEBUG SSH VARS (in Copy build) ==="
-          echo "USER='${{ secrets.SSH_USER }}'"
-          echo "HOST='${{ secrets.SSH_HOST }}'"
-          echo "PORT='${{ secrets.SSH_PORT }}'"
-          echo "====================================="
+        run: |          
           # scp uses -P (capital P) to specify non-default port
           scp -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -P "${{ secrets.SSH_PORT }}" -r ./publish/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol/"
 
