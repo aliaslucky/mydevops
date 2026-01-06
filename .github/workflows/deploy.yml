@@ -20,22 +20,24 @@ jobs:
       - name: Build .NET app
         run: dotnet publish ./app -c Release -o publish
 
+     # Crea il file della chiave privata RSA per SSH
+      - name: Create SSH key file
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       # Connessione SSH alla macchina locale per fare il deploy
       - name: Deploy to local machine via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          # Indirizzo IP o hostname della macchina locale
-          host: ${{ secrets.SSH_HOST }}
-          # Porta
-          port: ${{ secrets.SSH_PORT }}
-          # Utente SSH configurato nei secrets
-          username: ${{ secrets.SSH_USER }}
-          # Chiave privata SSH
-          key: ${{ secrets.SSH_KEY }}
-          # Script eseguito da GitHub Actions sulla macchina locale
-          script: |
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_rsa \
+              -p "${{ secrets.SSH_PORT }}" \
+              "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+              '
+              # Copia i file compilati dentro il container esistente
+              docker cp publish/. mydevops_container:/app
 
-            # Copia i file compilati dentro il container esistente
-            docker cp publish/. mydevops_container:/app
-            # Riavvia il processo dotnet dentro il container (senza ricrearlo)
-            docker exec mydevops_container pkill dotnet || true
+              # Riavvia il processo dotnet dentro il container (senza ricrearlo)
+              docker exec mydevops_container pkill dotnet || true
+              '
