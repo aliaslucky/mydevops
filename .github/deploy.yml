@@ -33,6 +33,13 @@ jobs:
           ssh-keygen -y -f ~/.ssh/github_actions_key > /tmp/github_actions_key.pub
           ssh-keygen -l -f /tmp/github_actions_key.pub || true
 
+        # Debug dei secrets SSH
+      - name: Debug SSH variables
+        run: |
+          echo "USER='${{ secrets.SSH_USER }}'"
+          echo "HOST='${{ secrets.SSH_HOST }}'"
+          echo "PORT='${{ secrets.SSH_PORT }}'"
+
       # Copy build to remote host using the key
       - name: Copy build to remote host
         run: |
