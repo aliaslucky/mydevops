@@ -45,7 +45,7 @@ jobs:
       - name: Copy build to remote host
         run: |          
           # scp uses -P (capital P) to specify non-default port
-          scp -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -P "${{ secrets.SSH_PORT }}" -r ./publish/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol/"
+          scp -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -P "${{ secrets.SSH_PORT }}" -r ./publish/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/Users/admin/Documents/CORSI/CORSO .NET/Code/MyIaC/DevOps/02_DevOps/vol/"
 
       - name: Restart container on remote host
         run: |
@@ -55,6 +55,6 @@ jobs:
         run: |
           ssh -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
           # Copy from the directory where we uploaded files into the container
-          docker cp /Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol/. mydevops_container:/app
+          docker cp /Users/admin/Documents/CORSI/CORSO .NET/Code/MyIaC/DevOps/02_DevOps/vol/. mydevops_container:/app
           docker exec mydevops_container pkill dotnet || true
           EOF
