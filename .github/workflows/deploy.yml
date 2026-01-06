@@ -23,6 +23,7 @@ jobs:
 
       # Create SSH key file BEFORE any scp/ssh steps
       - name: Decode SSH key from Base64
+        if: ${{ always() }}
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" | base64 --decode > ~/.ssh/github_actions_key
