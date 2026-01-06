@@ -28,9 +28,9 @@ jobs:
       - name: Decode SSH key from Base64
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY_B64 }}" | base64 --decode > ~/.ssh/github_actions_key
+          echo "${{ secrets.SSH_KEY }}" | base64 --decode > ~/.ssh/github_actions_key
           chmod 600 ~/.ssh/github_actions_key
-          
+
       - name: Debug key header
         run: |
          echo "----- START KEY -----"
