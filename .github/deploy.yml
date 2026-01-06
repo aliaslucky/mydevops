@@ -1,37 +1,21 @@
-# Nome del workflow
+# Build and Deploy (fixed)
 name: Build and Deploy
 
-# Trigger: esegue il workflow a ogni push sul branch main
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  # Nome del job
   build:
-    # Usa una macchina Ubuntu di GitHub Actions
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout del repository per accedere ai file
       - uses: actions/checkout@v4
 
-      # Compila l'app .NET e genera la cartella publish
       - name: Build .NET app
         run: dotnet publish ./app -c Release -o publish
 
-      # Disabilita l’SSH agent che causa i tentativi multipli
-      - name: Disable SSH agent
-        run: |
-          eval "$(ssh-agent -k)" || true
-
-      - name: Copy build to Docker volume
-        run: scp -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SSH_HOST:"/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol"
-
-      - name: Restart container
-        run: ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "docker restart mydevops_container"
-
-      # Crea il file della chiave privata RSA per SSH
+      # Create SSH key file BEFORE any scp/ssh steps
       - name: Decode SSH key from Base64
         run: |
           mkdir -p ~/.ssh
@@ -41,23 +25,28 @@ jobs:
       - name: Debug key header
         run: |
           echo "----- START KEY -----"
-          head -n 5 ~/.ssh/github_actions_key
+          head -n 5 ~/.ssh/github_actions_key || true
           echo "----- END KEY -----"
 
-      - name: Check key validity
+      - name: Check key validity (fingerprint)
         run: |
-          ssh-keygen -l -f ~/.ssh/github_actions_key
+          ssh-keygen -y -f ~/.ssh/github_actions_key > /tmp/github_actions_key.pub
+          ssh-keygen -l -f /tmp/github_actions_key.pub || true
 
-      # Connessione SSH alla macchina locale per fare il deploy
-      - name: Deploy to local machine via SSH
+      # Copy build to remote host using the key
+      - name: Copy build to remote host
         run: |
-          ssh \
-            -o StrictHostKeyChecking=no \
-            -o IdentitiesOnly=yes \
-            -o PreferredAuthentications=publickey \
-            -i ~/.ssh/github_actions_key \
-            -p "${{ secrets.SSH_PORT }}" \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
-            docker cp publish/. mydevops_container:/app
-            docker exec mydevops_container pkill dotnet || true
+          # scp uses -P (capital P) to specify non-default port
+          scp -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -P "${{ secrets.SSH_PORT }}" -r ./publish/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol/"
+
+      - name: Restart container on remote host
+        run: |
+          ssh -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "docker restart mydevops_container"
+
+      - name: Deploy into container on remote host
+        run: |
+          ssh -i ~/.ssh/github_actions_key -o StrictHostKeyChecking=no -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
+          # Copy from the directory where we uploaded files into the container
+          docker cp /Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol/. mydevops_container:/app
+          docker exec mydevops_container pkill dotnet || true
           EOF
