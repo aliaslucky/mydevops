@@ -19,16 +19,16 @@ jobs:
       # Compila l'app .NET e genera la cartella publish
       - name: Build .NET app
         run: dotnet publish ./app -c Release -o publish
-    # 🔥 Disabilita l’SSH agent che causa i tentativi multipli
+    # Disabilita l’SSH agent che causa i tentativi multipli
       - name: Disable SSH agent
         run: |
          eval "$(ssh-agent -k)" || true
 
      # Crea il file della chiave privata RSA per SSH
-      - name: Create SSH key file
+      - name: Decode SSH key from Base64
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github_actions_key
+          echo "${{ secrets.SSH_KEY_B64 }}" | base64 --decode > ~/.ssh/github_actions_key
           chmod 600 ~/.ssh/github_actions_key
 
       # Connessione SSH alla macchina locale per fare il deploy
@@ -41,6 +41,6 @@ jobs:
             -i ~/.ssh/github_actions_key \
             -p "${{ secrets.SSH_PORT }}" \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
-                docker cp publish/. mydevops_container:/app
-                docker exec mydevops_container pkill dotnet || true
-          EOF
+docker cp publish/. mydevops_container:/app
+docker exec mydevops_container pkill dotnet || true
+EOF
