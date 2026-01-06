@@ -56,10 +56,11 @@ resource "docker_container" "app_container" {
         # Porta esterna accessibile dalla macchina host
         external = 8080
     }
+
     mounts {
-        target = "/app"
+        target = "/deploy"
         source = "/Users/admin/Documents/CORSI/CORSO .NET/Code/MyIaC/DevOps/02_DevOps/vol"
         type   = "bind"
     }
-    
+
 }

@@ -19,10 +19,17 @@ jobs:
       # Compila l'app .NET e genera la cartella publish
       - name: Build .NET app
         run: dotnet publish ./app -c Release -o publish
-    # Disabilita l’SSH agent che causa i tentativi multipli
+
+      # Disabilita l’SSH agent che causa i tentativi multipli
       - name: Disable SSH agent
         run: |
          eval "$(ssh-agent -k)" || true
+
+      - name: Copy build to Docker volume
+        run: scp -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SSH_HOST:"/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol"
+
+      - name: Restart container
+        run: ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "docker restart mydevops_container"
 
      # Crea il file della chiave privata RSA per SSH
       - name: Decode SSH key from Base64
