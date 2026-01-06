@@ -26,12 +26,15 @@ jobs:
         with:
           # Indirizzo IP o hostname della macchina locale
           host: ${{ secrets.SSH_HOST }}
+          # Porta
+          port: ${{ secrets.SSH_PORT }}
           # Utente SSH configurato nei secrets
           username: ${{ secrets.SSH_USER }}
           # Chiave privata SSH
           key: ${{ secrets.SSH_KEY }}
           # Script eseguito da GitHub Actions sulla macchina locale
           script: |
+
             # Copia i file compilati dentro il container esistente
             docker cp publish/. mydevops_container:/app
             # Riavvia il processo dotnet dentro il container (senza ricrearlo)
