@@ -23,9 +23,9 @@ jobs:
       # Disabilita l’SSH agent che causa i tentativi multipli
       - name: Disable SSH agent
         run: |
-         eval "$(ssh-agent -k)" || true
+          eval "$(ssh-agent -k)" || true
 
-      # Copia la build nel volume Docker (VERSIONE CORRETTA)
+      # Copia la build nel volume Docker
       - name: Copy build to Docker volume
         run: |
           scp \
@@ -37,7 +37,7 @@ jobs:
             -r ./publish/* \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/Users/admin/Documents/CORSI/CORSO_NET/Code/MyIaC/DevOps/02_DevOps/vol"
 
-      # Riavvia il container (VERSIONE CORRETTA)
+      # Riavvia il container
       - name: Restart container
         run: |
           ssh \
@@ -49,7 +49,7 @@ jobs:
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "docker restart mydevops_container"
 
-     # Crea il file della chiave privata RSA per SSH
+      # Crea il file della chiave privata RSA per SSH
       - name: Decode SSH key from Base64
         run: |
           mkdir -p ~/.ssh
@@ -58,9 +58,9 @@ jobs:
 
       - name: Debug key header
         run: |
-         echo "----- START KEY -----"
-         head -n 5 ~/.ssh/github_actions_key
-         echo "----- END KEY -----"
+          echo "----- START KEY -----"
+          head -n 5 ~/.ssh/github_actions_key
+          echo "----- END KEY -----"
 
       - name: Check key validity
         run: |
