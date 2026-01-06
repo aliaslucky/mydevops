@@ -22,4 +22,5 @@ WORKDIR /app
 # Copia i file pubblicati dalla fase di build
 COPY --from=build /out .
 # Avvia l'applicazione .NET pubblicata
-ENTRYPOINT ["dotnet", "app.dll"]
+# ENTRYPOINT ["dotnet", "app.dll"]
+ENTRYPOINT ["sh", "-c", "if [ -f /deploy/app.dll ]; then dotnet /deploy/app.dll; else dotnet /app/app.dll; fi"]
