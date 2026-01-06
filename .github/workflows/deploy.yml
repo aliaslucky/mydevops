@@ -31,6 +31,7 @@ jobs:
       - name: Deploy to local machine via SSH
         run: |
           ssh -o StrictHostKeyChecking=no \
+              -o IdentitiesOnly=yes \
               -i ~/.ssh/id_rsa \
               -p "${{ secrets.SSH_PORT }}" \
               "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
